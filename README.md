@@ -2,7 +2,7 @@
 
 ## Description
 This application will simulate requests made to the BigPanda Alert API (or any api). 
-The volume of requests per time interval id configurable. Can be used to test throttling.
+The volume of requests per time interval is configurable. Can be used to test throttling.
 
 ## Installation
 
