@@ -1,6 +1,11 @@
 const yargs = require('yargs');
 const loadtest = require('loadtest');
 
+// The following is a wrapper around the loadTest npm package. Luckily it has an api so we
+// can include application specific behavior necessary for testing our endpoints. The underlying
+// package can be used independently of this application. See https://www.npmjs.com/package/loadtest
+
+// Define CLI arguments to pass as options into the loadTest client.
 const argv = yargs
     .options({
         'concurrent': {
@@ -27,6 +32,7 @@ const argv = yargs
     .alias('help', 'h')
     .argv;
 
+// Generic BigPanda Alert payload to send with requests.
 const alert = {
     app_key: "some_app_key",
     status: "critical",
@@ -36,6 +42,7 @@ const alert = {
     cluster: "east-production-databases"
 };
 
+// Map CLI argument values to loadTest option parameters.
 const options = {
     url: argv.url,
     maxRequests: argv.maxRequests,
