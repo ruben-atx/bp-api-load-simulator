@@ -42,8 +42,8 @@ const options = {
     concurrency: argv.concurrent ? argv.concurrency : 1,
     requestsPerSecond: argv.requestsPerSecond,
     method: 'POST',
-    body: JSON.stringify(alert)
-
+    body: JSON.stringify(alert),
+    contentType: "application/json"
 };
 
 loadtest.loadTest(options, (error, result) => {
