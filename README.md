@@ -21,4 +21,4 @@ make a total of 10 requests.
 
 _requestPerSecond_ (required): Number of requests to post per second.
 
-    node app.js --endpoint="https://api.bigpanda.io/data/v2/alerts" --concurrent=2 --maxResults=100 --requestPerSecond=5
+    node app.js --endpoint="https://api.bigpanda.io/data/v2/alerts" --concurrent=2 --maxRequests=100 --requestsPerSecond=5

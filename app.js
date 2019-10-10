@@ -1,9 +1,5 @@
 const yargs = require('yargs');
-const loadtest = require('loadtest');
-
-// The following is a wrapper around the loadTest npm package. Luckily it has an api so we
-// can include application specific behavior necessary for testing our endpoints. The underlying
-// package can be used independently of this application. See https://www.npmjs.com/package/loadtest
+const rp = require('request-promise');
 
 // Define CLI arguments to pass as options into the loadTest client.
 const argv = yargs
@@ -32,32 +28,51 @@ const argv = yargs
     .alias('help', 'h')
     .argv;
 
-// Generic BigPanda Alert payload to send with requests.
-const alert = {
-    app_key: "some_app_key",
-    status: "critical",
-    host: "aws-east-production-database-1",
-    check: "CPU overloaded",
-    description: "CPU is above upper limit (70%)",
-    cluster: "east-production-databases"
-};
-
 // Map CLI argument values to loadTest option parameters.
-const options = {
+const args = {
     url: argv.url,
     maxRequests: argv.maxRequests,
-    concurrency: argv.concurrent ? argv.concurrency : 1,
-    requestsPerSecond: argv.requestsPerSecond,
-    method: 'POST',
-    body: JSON.stringify(alert),
-    contentType: "application/json"
+    concurrency: argv.concurrent ? argv.concurrent : 1,
+    requestsPerSecond: argv.requestsPerSecond
 };
 
-loadtest.loadTest(options, (error, result) => {
-    if (error) {
-        return console.error('Got an error: %s', error);
+// options for request-promise
+let options = {
+    method: 'POST',
+    uri: args.url,
+    body: {},
+    json: true,
+    headers: {
+        Authorization: 'Bearer 7fdea8bdd205f364fce92cc0c28a1e0a'
     }
+};
 
-    console.log('---- Test Results ----');
-    console.log(result);
-});
+// divide max requests by number of concurrent calls. i.e. concurrency = 2, max requests = 10, -> 5 requests sent per call.
+let splitRequests = Math.ceil(args.maxRequests / args.concurrency);
+
+for (let i = 0; i < args.concurrency; i++) {
+    postRequests(splitRequests, options);
+}
+
+async function postRequests(maxRequests, options) {
+    for (let k = 0; k < maxRequests; k++) {
+
+        // Generic BigPanda Alert payload to send with requests.
+        options.body = {
+            app_key: "5da30a06f61c3d81bf13cc83f0808fbc",
+            status: "critical",
+            host: `aws-east-production-database-${Math.floor(Math.random() * 100)}`,
+            check: "CPU overloaded",
+            description: "CPU is above upper limit (70%)",
+            cluster: "east-production-databases"
+        };
+
+        rp(options)
+            .then(function (parsedBody) {
+                console.log(parsedBody);
+            })
+            .catch(function (err) {
+                console.log(err);
+            });
+    }
+}
